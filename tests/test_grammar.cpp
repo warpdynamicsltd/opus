@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "grammar/grammar.h"  // Include your header file
 
-std::vector<size_t> _st(const GrammarNode<std::string>* node,const std::string& input, size_t index)
+std::vector<size_t> st(const GrammarCore<std::string>* node, const std::string& input, size_t index)
 {
     if (index < input.size() && input.substr(index, node->root_string.size()) == node->root_string) {
         return {index + node->root_string.size() };
@@ -9,7 +9,7 @@ std::vector<size_t> _st(const GrammarNode<std::string>* node,const std::string& 
     return {};
 }
 
-std::vector<size_t> _digit(const GrammarNode<std::string>* node,const std::string& input, size_t index)
+std::vector<size_t> digit(const GrammarCore<std::string>* node, const std::string& input, size_t index)
 {
     if (index < input.size() && std::isdigit(input[index])){
         return {index + 1};
@@ -17,7 +17,7 @@ std::vector<size_t> _digit(const GrammarNode<std::string>* node,const std::strin
     return {};
 }
 
-std::vector<size_t> _end(const GrammarNode<std::string>* node,const std::string& input, size_t index)
+std::vector<size_t> end(const GrammarCore<std::string>* node, const std::string& input, size_t index)
 {
     if (index >= input.size()){
         return {index};
@@ -30,24 +30,13 @@ std::vector<size_t> _end(const GrammarNode<std::string>* node,const std::string&
 #define TEST_NODE_FAILURE(node, input) ASSERT_TRUE(node(input, 0).empty())
 
 TEST(GrammarAddTest, SimpleTestCase) {
-    SmartGrammarNode<std::string> d(new GrammarNode<std::string>(_digit));
-    SmartGrammarNode<std::string> e(new GrammarNode<std::string>(_end));    
+    GrammarNode<std::string> number, start, sum, exp;
+    GrammarNode<std::string> d(digit), e(end), lb(st, "("), rb(st, ")"), plus(st, "+");
 
-
-    SmartGrammarNode<std::string> number(new GrammarNode<std::string>());
-    SmartGrammarNode<std::string> start(new GrammarNode<std::string>());
-    SmartGrammarNode<std::string> sum(new GrammarNode<std::string>());
-    SmartGrammarNode<std::string> exp(new GrammarNode<std::string>());
-
-    SmartGrammarNode<std::string> lb(new GrammarNode<std::string>(_st, "("));
-    SmartGrammarNode<std::string> rb(new GrammarNode<std::string>(_st, ")"));
-    SmartGrammarNode<std::string> plus(new GrammarNode<std::string>(_st, "+"));
-
-
-    number = (d | d + number);
-    exp = number | (lb + sum + rb);
-    sum = exp | (exp + plus + sum);
-    start = (sum + e);
+    number = d | d + number;
+    exp = number | lb + sum + rb;
+    sum = exp | exp + plus + sum;
+    start = sum + e;
     
     // Valid cases
     TEST_NODE_SUCCESS(start, "1");
@@ -199,25 +188,14 @@ TEST(GrammarAddTest, SimpleTestCase) {
 
 
 TEST(GrammarMulTest, MultiplicationTestCase) {
-    SmartGrammarNode<std::string> d(new GrammarNode<std::string>(_digit));
-    SmartGrammarNode<std::string> e(new GrammarNode<std::string>(_end));
+    GrammarNode<std::string> number, start, sum, exp, mul;
+    GrammarNode<std::string> d(digit), e(end), lb(st, "("), rb(st, ")"), plus(st, "+"), times(st, "*");
 
-    SmartGrammarNode<std::string> number(new GrammarNode<std::string>());
-    SmartGrammarNode<std::string> start(new GrammarNode<std::string>());
-    SmartGrammarNode<std::string> sum(new GrammarNode<std::string>());
-    SmartGrammarNode<std::string> mul(new GrammarNode<std::string>());
-    SmartGrammarNode<std::string> exp(new GrammarNode<std::string>());
-
-    SmartGrammarNode<std::string> lb(new GrammarNode<std::string>(_st, "("));
-    SmartGrammarNode<std::string> rb(new GrammarNode<std::string>(_st, ")"));
-    SmartGrammarNode<std::string> plus(new GrammarNode<std::string>(_st, "+"));
-    SmartGrammarNode<std::string> times(new GrammarNode<std::string>(_st, "*"));
-
-    number = (d | (d + number));
-    exp = number | (lb + sum + rb);
-    mul = exp | (exp + times + mul);     // multiplication is now available
-    sum = mul | (mul + plus + sum);      // sum is now mul (+ sum)
-    start = (sum + e);
+    number = d | d + number;
+    exp = number | lb + sum + rb;
+    mul = exp | exp + times + mul;     // multiplication is now available
+    sum = mul | mul + plus + sum;      // sum is now mul (+ sum)
+    start = sum + e;
 
     // -- Valid cases --
     TEST_NODE_SUCCESS(start, "1");

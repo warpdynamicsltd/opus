@@ -7,74 +7,61 @@
 #include <memory>
 #include <tuple>
 
-// Represents a term produced by grammar parsing
-struct GrammarTerm {
-    std::string name;
-    std::vector<GrammarTerm> args;
-
-    GrammarTerm(const std::string& name, const std::vector<GrammarTerm>& args = {})
-        : name(name), args(args) {}
-};
-
-// Represents a grammar node for parsing operations
 template <typename T = std::string>
-class GrammarNode {
+class GrammarCore {
 public:
-    using GrammarFunction = std::function<std::vector<std::tuple<size_t, GrammarTerm>>(const T&, size_t)>;
-
-    typedef std::vector<size_t>(*GrammarFunction2)(const GrammarNode<T>*, const T&, size_t);
-    enum Mode {PLUS, OR, ASSIGN, ROOT};
+    typedef std::vector<size_t>(*GrammarFunction)(const GrammarCore<T>*, const T&, size_t);
 
 public:
-    std::string name;
-    bool consumable;
-    GrammarFunction func;
+    GrammarFunction func = nullptr;
+    //Mode mode;
     
-    GrammarFunction2 func2;
-    Mode mode;
-    
-    const GrammarNode<T> *left;
-    const GrammarNode<T> *right;
+    const GrammarCore<T> *left;
+    const GrammarCore<T> *right;
 
     std::string root_string;
 
 public:
-    // Constructors
-    GrammarNode();
-    GrammarNode(const GrammarFunction2&);
-    GrammarNode(const GrammarFunction2&, const std::string& root_string);
-
-
-    std::vector<size_t> _assign(const T&, size_t) const;
-    std::vector<size_t> _plus(const T&, size_t) const;
-    std::vector<size_t> _or(const T&, size_t) const;
+    GrammarCore();
+    GrammarCore(const GrammarFunction&);
+    GrammarCore(const GrammarFunction&, const std::string& root_string);
 
     std::vector<size_t> _call(const T&, size_t) const;
 
-    void create_assignment(const GrammarNode<T>* other);
-    GrammarNode<T>* create_plus(const GrammarNode<T>* other) const;
-    GrammarNode<T>* create_or(const GrammarNode<T>* other) const;
+    void create_assignment(const GrammarCore<T>* other);
+    GrammarCore<T>* create_plus(const GrammarCore<T>* other) const;
+    GrammarCore<T>* create_or(const GrammarCore<T>* other) const;
 
-    // Core parsing function
-    std::vector<size_t> operator()(const T& input, size_t index) const;
-
-    // Factory for constructing grammar nodes
-    static GrammarNode<T>& Factory(const GrammarFunction& func);
 };
 
 template <typename T>
-class SmartGrammarNode
+std::vector<size_t> assign(const GrammarCore<T>*, const T&, size_t);
+
+template <typename T>
+std::vector<size_t> add(const GrammarCore<T>*, const T&, size_t);
+
+template <typename T>
+std::vector<size_t> alternative(const GrammarCore<T>*, const T&, size_t);
+
+template <typename T>
+class GrammarNode
 {
     public:
-        SmartGrammarNode(GrammarNode<T>* node) : node(node) {}
-        GrammarNode<T> *node;
+        GrammarNode();
+        GrammarNode(GrammarCore<T>* node) : node(node) {}
+        GrammarNode(const typename GrammarCore<T>::GrammarFunction& func)
+        : node(new GrammarCore<T>(func)) {}
+        GrammarNode(const typename GrammarCore<T>::GrammarFunction& func, const std::string& root_string) 
+        : node(new GrammarCore<T>(func, root_string)) {}
 
-        SmartGrammarNode<T> operator+(const SmartGrammarNode<T>& other) const;
-        SmartGrammarNode<T> operator|(const SmartGrammarNode<T>& other) const;
+        GrammarCore<T> *node;
+
+        GrammarNode<T> operator+(const GrammarNode<T>& other) const;
+        GrammarNode<T> operator|(const GrammarNode<T>& other) const;
 
         std::vector<size_t> operator()(const T& input, size_t index) const;
 
-        SmartGrammarNode<T>& operator=(const SmartGrammarNode<T>& other);
+        GrammarNode<T>& operator=(const GrammarNode<T>& other);
 };
 
 #endif // GRAMMAR_H
