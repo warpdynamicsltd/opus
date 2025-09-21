@@ -2,7 +2,7 @@
 #include "grammar/grammar.h"  // Include your header file
 
 
-#define TEST_NODE_SUCCESS(node, input) ASSERT_TRUE(node(input, 0)[0] == std::string(input).size())
+#define TEST_NODE_SUCCESS(node, input) ASSERT_TRUE(node(input, 0)[0]->end == std::string(input).size())
 #define TEST_NODE_FAILURE(node, input) ASSERT_TRUE(node(input, 0).empty())
 
 TEST(GrammarAddTest, SimpleTestCase) {

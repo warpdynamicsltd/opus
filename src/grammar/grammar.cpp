@@ -31,11 +31,12 @@ typename GrammarCore<T>::GrammarResult assign(const GrammarCore<T>* that, const 
 template <typename T>
 typename GrammarCore<T>::GrammarResult add(const GrammarCore<T>* that, const T& input, size_t index)
 {
-    std::vector<size_t> result;
-    for (size_t i : that->left->call(input, index)) {
-        for (size_t j : that->right->call(input, i)) {
+    typename GrammarCore<T>::GrammarResult result;
+    for (ParsedNode<T>* n : that->left->call(input, index)) {
+        for (ParsedNode<T>* m : that->right->call(input, n->end)) {
             
-            result.push_back(j);
+            //result.push_back(j);
+            result.push_back(new ParsedNode<T>(that, n, m, index, m->end, input));
         }
     }
     return result;
@@ -113,7 +114,7 @@ GrammarNode<T>& GrammarNode<T>::operator=(const GrammarNode<T>& other)
 }
 
 template<typename T>
-std::vector<size_t> GrammarNode<T>::operator()(const T& input, size_t index) const
+typename GrammarCore<T>::GrammarResult GrammarNode<T>::operator()(const T& input, size_t index) const
 {
     return this->node->call(input, index);
 }
@@ -123,7 +124,8 @@ template class GrammarNode<std::string>;
 GrammarCoreStr::GrammarResult st(const GrammarCoreStr* node, const std::string& input, size_t index)
 {
     if (index < input.size() && input.substr(index, node->root_string.size()) == node->root_string) {
-        return { index + node->root_string.size() };
+        //return { index + node->root_string.size() };
+        return { new ParsedNodeStr(node, nullptr, nullptr, index, index + node->root_string.size(), input) };
     }
     return {};
 }
@@ -131,7 +133,8 @@ GrammarCoreStr::GrammarResult st(const GrammarCoreStr* node, const std::string& 
 GrammarCoreStr::GrammarResult digit(const GrammarCoreStr* node, const std::string& input, size_t index)
 {
     if (index < input.size() && std::isdigit(input[index])){
-        return { index + 1 };
+        // return {index + 1}
+        return { new ParsedNodeStr(node, nullptr, nullptr, index, index + 1, input) };
     }
     return {};
 }
@@ -139,7 +142,8 @@ GrammarCoreStr::GrammarResult digit(const GrammarCoreStr* node, const std::strin
 GrammarCoreStr::GrammarResult end(const GrammarCoreStr* node, const std::string& input, size_t index)
 {
     if (index >= input.size()){
-        return { index };
+        //return index;
+        return { new ParsedNodeStr(node, nullptr, nullptr, index, index, input) };
     }
     return {};
 }

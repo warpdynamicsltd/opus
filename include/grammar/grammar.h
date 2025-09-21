@@ -13,13 +13,11 @@ class ParsedNode;  // Forward declaration
 template <typename T = std::string>
 class GrammarCore {
 public:
-    //typedef ParsedNode<T>* GrammarResult;
-    typedef std::vector<size_t> GrammarResult;
+    typedef std::vector<ParsedNode<T>*> GrammarResult;
     typedef GrammarResult(*GrammarFunction)(const GrammarCore<T>*, const T&, size_t);
 
 public:
     GrammarFunction func = nullptr;
-    //Mode mode;
     
     const GrammarCore<T> *left = nullptr;
     const GrammarCore<T> *right = nullptr;
@@ -31,7 +29,7 @@ public:
     GrammarCore(const GrammarFunction&);
     GrammarCore(const GrammarFunction&, const std::string& root_string);
 
-    std::vector<size_t> call(const T&, size_t) const;
+    GrammarResult call(const T&, size_t) const;
 
     void create_assignment(const GrammarCore<T>* other);
     GrammarCore<T>* create_plus(const GrammarCore<T>* other) const;
@@ -64,7 +62,7 @@ class GrammarNode
         GrammarNode<T> operator+(const GrammarNode<T>& other) const;
         GrammarNode<T> operator|(const GrammarNode<T>& other) const;
 
-        std::vector<size_t> operator()(const T& input, size_t index) const;
+        typename GrammarCore<T>::GrammarResult operator()(const T& input, size_t index) const;
 
         GrammarNode<T>& operator=(const GrammarNode<T>& other);
 };
@@ -73,18 +71,28 @@ template <typename T>
 class ParsedNode
 {
     public:
-        GrammarCore<T> *node;
+        ParsedNode(
+            const GrammarCore<T>* node,
+            const ParsedNode<T>* left, 
+            const ParsedNode<T>* right, 
+            size_t start, 
+            size_t end, 
+            const T& data):
+                node(node), left(left), right(right), start(start), end(end), data(data) {}
+    public:
+        const GrammarCore<T> *node = nullptr;
 
         const ParsedNode<T>* left = nullptr;
         const ParsedNode<T>* right = nullptr;
 
-        size_t index;
-        size_t length;
+        size_t start = 0;
+        size_t end = 0;
         const T& data;
 };
 
 typedef GrammarNode<std::string> GrammarNodeStr;
 typedef GrammarCore<std::string> GrammarCoreStr;
+typedef ParsedNode<std::string> ParsedNodeStr;
 
 GrammarCoreStr::GrammarResult st(const GrammarCoreStr* node, const std::string& input, size_t index);
 
