@@ -7,10 +7,15 @@
 #include <memory>
 #include <tuple>
 
+template <typename T>
+class ParsedNode;  // Forward declaration
+
 template <typename T = std::string>
 class GrammarCore {
 public:
-    typedef std::vector<size_t>(*GrammarFunction)(const GrammarCore<T>*, const T&, size_t);
+    //typedef ParsedNode<T>* GrammarResult;
+    typedef std::vector<size_t> GrammarResult;
+    typedef GrammarResult(*GrammarFunction)(const GrammarCore<T>*, const T&, size_t);
 
 public:
     GrammarFunction func = nullptr;
@@ -35,13 +40,13 @@ public:
 };
 
 template <typename T>
-std::vector<size_t> assign(const GrammarCore<T>*, const T&, size_t);
+typename GrammarCore<T>::GrammarResult assign(const GrammarCore<T>*, const T&, size_t);
 
 template <typename T>
-std::vector<size_t> add(const GrammarCore<T>*, const T&, size_t);
+typename GrammarCore<T>::GrammarResult add(const GrammarCore<T>*, const T&, size_t);
 
 template <typename T>
-std::vector<size_t> alternative(const GrammarCore<T>*, const T&, size_t);
+typename GrammarCore<T>::GrammarResult alternative(const GrammarCore<T>*, const T&, size_t);
 
 template <typename T>
 class GrammarNode
@@ -81,11 +86,11 @@ class ParsedNode
 typedef GrammarNode<std::string> GrammarNodeStr;
 typedef GrammarCore<std::string> GrammarCoreStr;
 
-std::vector<size_t> st(const GrammarCoreStr* node, const std::string& input, size_t index);
+GrammarCoreStr::GrammarResult st(const GrammarCoreStr* node, const std::string& input, size_t index);
 
-std::vector<size_t> digit(const GrammarCoreStr* node, const std::string& input, size_t index);
+GrammarCoreStr::GrammarResult digit(const GrammarCoreStr* node, const std::string& input, size_t index);
 
-std::vector<size_t> end(const GrammarCoreStr* node, const std::string& input, size_t index);
+GrammarCoreStr::GrammarResult end(const GrammarCoreStr* node, const std::string& input, size_t index);
 
 
 #endif // GRAMMAR_H

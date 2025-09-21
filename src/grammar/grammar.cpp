@@ -23,13 +23,13 @@ GrammarCore<T>::GrammarCore(const GrammarFunction& customFunc, const std::string
 }
 
 template <typename T>
-std::vector<size_t> assign(const GrammarCore<T>* that, const T& input, size_t index)
+typename GrammarCore<T>::GrammarResult assign(const GrammarCore<T>* that, const T& input, size_t index)
 {
     return that->left->call(input, index);
 }
 
 template <typename T>
-std::vector<size_t> add(const GrammarCore<T>* that, const T& input, size_t index)
+typename GrammarCore<T>::GrammarResult add(const GrammarCore<T>* that, const T& input, size_t index)
 {
     std::vector<size_t> result;
     for (size_t i : that->left->call(input, index)) {
@@ -42,7 +42,7 @@ std::vector<size_t> add(const GrammarCore<T>* that, const T& input, size_t index
 }
 
 template <typename T>
-std::vector<size_t> alternative(const GrammarCore<T>* that, const T& input, size_t index)
+typename GrammarCore<T>::GrammarResult alternative(const GrammarCore<T>* that, const T& input, size_t index)
 {
     auto result = that->left->call(input, index);
     auto otherResult = that->right->call(input, index);
@@ -51,7 +51,7 @@ std::vector<size_t> alternative(const GrammarCore<T>* that, const T& input, size
 }
 
 template <typename T>
-std::vector<size_t> GrammarCore<T>::call(const T& input, size_t index) const
+typename GrammarCore<T>::GrammarResult GrammarCore<T>::call(const T& input, size_t index) const
 {
     return func(this, input, index);
 }
@@ -120,7 +120,7 @@ std::vector<size_t> GrammarNode<T>::operator()(const T& input, size_t index) con
 
 template class GrammarNode<std::string>;
 
-std::vector<size_t> st(const GrammarCoreStr* node, const std::string& input, size_t index)
+GrammarCoreStr::GrammarResult st(const GrammarCoreStr* node, const std::string& input, size_t index)
 {
     if (index < input.size() && input.substr(index, node->root_string.size()) == node->root_string) {
         return { index + node->root_string.size() };
@@ -128,7 +128,7 @@ std::vector<size_t> st(const GrammarCoreStr* node, const std::string& input, siz
     return {};
 }
 
-std::vector<size_t> digit(const GrammarCoreStr* node, const std::string& input, size_t index)
+GrammarCoreStr::GrammarResult digit(const GrammarCoreStr* node, const std::string& input, size_t index)
 {
     if (index < input.size() && std::isdigit(input[index])){
         return { index + 1 };
@@ -136,7 +136,7 @@ std::vector<size_t> digit(const GrammarCoreStr* node, const std::string& input, 
     return {};
 }
 
-std::vector<size_t> end(const GrammarCoreStr* node, const std::string& input, size_t index)
+GrammarCoreStr::GrammarResult end(const GrammarCoreStr* node, const std::string& input, size_t index)
 {
     if (index >= input.size()){
         return { index };
