@@ -16,8 +16,8 @@ public:
     GrammarFunction func = nullptr;
     //Mode mode;
     
-    const GrammarCore<T> *left;
-    const GrammarCore<T> *right;
+    const GrammarCore<T> *left = nullptr;
+    const GrammarCore<T> *right = nullptr;
 
     std::string root_string;
 
@@ -26,7 +26,7 @@ public:
     GrammarCore(const GrammarFunction&);
     GrammarCore(const GrammarFunction&, const std::string& root_string);
 
-    std::vector<size_t> _call(const T&, size_t) const;
+    std::vector<size_t> call(const T&, size_t) const;
 
     void create_assignment(const GrammarCore<T>* other);
     GrammarCore<T>* create_plus(const GrammarCore<T>* other) const;
@@ -63,5 +63,29 @@ class GrammarNode
 
         GrammarNode<T>& operator=(const GrammarNode<T>& other);
 };
+
+template <typename T>
+class ParsedNode
+{
+    public:
+        GrammarCore<T> *node;
+
+        const ParsedNode<T>* left = nullptr;
+        const ParsedNode<T>* right = nullptr;
+
+        size_t index;
+        size_t length;
+        const T& data;
+};
+
+typedef GrammarNode<std::string> GrammarNodeStr;
+typedef GrammarCore<std::string> GrammarCoreStr;
+
+std::vector<size_t> st(const GrammarCoreStr* node, const std::string& input, size_t index);
+
+std::vector<size_t> digit(const GrammarCoreStr* node, const std::string& input, size_t index);
+
+std::vector<size_t> end(const GrammarCoreStr* node, const std::string& input, size_t index);
+
 
 #endif // GRAMMAR_H

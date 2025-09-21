@@ -1,30 +1,6 @@
 #include <gtest/gtest.h>
 #include "grammar/grammar.h"  // Include your header file
 
-std::vector<size_t> st(const GrammarCore<std::string>* node, const std::string& input, size_t index)
-{
-    if (index < input.size() && input.substr(index, node->root_string.size()) == node->root_string) {
-        return {index + node->root_string.size() };
-    }
-    return {};
-}
-
-std::vector<size_t> digit(const GrammarCore<std::string>* node, const std::string& input, size_t index)
-{
-    if (index < input.size() && std::isdigit(input[index])){
-        return {index + 1};
-    }
-    return {};
-}
-
-std::vector<size_t> end(const GrammarCore<std::string>* node, const std::string& input, size_t index)
-{
-    if (index >= input.size()){
-        return {index};
-    }
-    return {};
-}
-
 
 #define TEST_NODE_SUCCESS(node, input) ASSERT_TRUE(node(input, 0)[0] == std::string(input).size())
 #define TEST_NODE_FAILURE(node, input) ASSERT_TRUE(node(input, 0).empty())
