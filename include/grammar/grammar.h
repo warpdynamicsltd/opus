@@ -7,12 +7,15 @@
 #include <memory>
 #include <tuple>
 
+#include "abstract_term.h"
+
 template <typename T>
 class ParsedNode;  // Forward declaration
 
 template <typename T = std::string>
 class GrammarCore {
 public:
+    typedef AbstractTerm<ParsedNode<T>*> ParsedNodeTerm; 
     typedef std::vector<ParsedNode<T>*> GrammarResult;
     typedef GrammarResult(*GrammarFunction)(const GrammarCore<T>*, const T&, size_t);
 

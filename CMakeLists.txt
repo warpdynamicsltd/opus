@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
 
-include_directories(include include/grammar)
+include_directories(include include/grammar include/abstract_term)
 
 # Automatically gather all .cpp files under src/
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS src/*.cpp)
