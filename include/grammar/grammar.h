@@ -4,6 +4,7 @@
 #include <string>
 #include <functional>
 #include <vector>
+#include <set>
 #include <memory>
 #include <tuple>
 
@@ -16,7 +17,7 @@ template <typename T = std::string>
 class GrammarCore {
 public:
     typedef AbstractTerm<ParsedNode<T>*> ParsedNodeTerm; 
-    typedef std::vector<ParsedNode<T>*> GrammarResult;
+    typedef std::vector<ParsedNodeTerm*> GrammarResult;
     typedef GrammarResult(*GrammarFunction)(const GrammarCore<T>*, const T&, size_t);
 
 public:
@@ -74,28 +75,36 @@ template <typename T>
 class ParsedNode
 {
     public:
+        static std::set<void*> allocated;
+
+        static void clear_allocated();
+
+    public:
         ParsedNode(
-            const GrammarCore<T>* node,
-            const ParsedNode<T>* left, 
-            const ParsedNode<T>* right, 
+            const GrammarCore<T>* node, 
             size_t start, 
             size_t end, 
             const T& data):
-                node(node), left(left), right(right), start(start), end(end), data(data) {}
+                node(node),  
+                start(start), 
+                end(end), 
+                data(data) {}
     public:
         const GrammarCore<T> *node = nullptr;
-
-        const ParsedNode<T>* left = nullptr;
-        const ParsedNode<T>* right = nullptr;
 
         size_t start = 0;
         size_t end = 0;
         const T& data;
+
+    public:
+        static void* operator new(size_t size);
+        static void operator delete(void* ptr);
 };
 
 typedef GrammarNode<std::string> GrammarNodeStr;
 typedef GrammarCore<std::string> GrammarCoreStr;
 typedef ParsedNode<std::string> ParsedNodeStr;
+
 
 GrammarCoreStr::GrammarResult st(const GrammarCoreStr* node, const std::string& input, size_t index);
 
