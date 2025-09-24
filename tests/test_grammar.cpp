@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
-#include "grammar/grammar.h"  // Include your header file
+#include "grammar.h"  // Include your header file
 
 
-#define TEST_NODE_SUCCESS(node, input) ASSERT_TRUE(node(input, 0)[0]->end == std::string(input).size())
+#define TEST_NODE_SUCCESS(node, input) ASSERT_TRUE(node(input, 0)[0]->value->end == std::string(input).size())
 #define TEST_NODE_FAILURE(node, input) ASSERT_TRUE(node(input, 0).empty())
 
 TEST(GrammarAddTest, SimpleTestCase) {
-    GrammarNode<std::string> number, start, sum, exp;
-    GrammarNode<std::string> d(digit), e(end), lb(st, "("), rb(st, ")"), plus(st, "+");
+    GrammarNodeStr number, start, sum, exp;
+    GrammarNodeStr d(digit), e(end), lb(st, "("), rb(st, ")"), plus(st, "+");
 
     number = d | d + number;
     exp = number | lb + sum + rb;
@@ -159,13 +159,17 @@ TEST(GrammarAddTest, SimpleTestCase) {
     TEST_NODE_FAILURE(start, "1$2");
     TEST_NODE_FAILURE(start, "(1+2)$");
 
+    ParsedNode<std::string>::clear_allocated();
+    GrammarCoreStr::ParsedNodeTerm::clear_allocated();
+    GrammarNodeStr::clear_allocated();
+    GrammarCoreStr::clear_allocated();
 
 }
 
 
 TEST(GrammarMulTest, MultiplicationTestCase) {
-    GrammarNode<std::string> number, start, sum, exp, mul;
-    GrammarNode<std::string> d(digit), e(end), lb(st, "("), rb(st, ")"), plus(st, "+"), times(st, "*");
+    GrammarNodeStr number, start, sum, exp, mul;
+    GrammarNodeStr d(digit), e(end), lb(st, "("), rb(st, ")"), plus(st, "+"), times(st, "*");
 
     number = d | d + number;
     exp = number | lb + sum + rb;
@@ -315,4 +319,9 @@ TEST(GrammarMulTest, MultiplicationTestCase) {
     TEST_NODE_FAILURE(start, "1#2");
     TEST_NODE_FAILURE(start, "1*2&3");
     TEST_NODE_FAILURE(start, "(1*2)$");
+
+    ParsedNode<std::string>::clear_allocated();
+    GrammarCoreStr::ParsedNodeTerm::clear_allocated();
+    GrammarNodeStr::clear_allocated();
+    GrammarCoreStr::clear_allocated();
 }

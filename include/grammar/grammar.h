@@ -9,35 +9,37 @@
 #include <tuple>
 
 #include "abstract_term.h"
+#include "memory.h"
 
 template <typename T>
 class ParsedNode;  // Forward declaration
 
 template <typename T = std::string>
-class GrammarCore {
-public:
-    typedef AbstractTerm<ParsedNode<T>*> ParsedNodeTerm; 
-    typedef std::vector<ParsedNodeTerm*> GrammarResult;
-    typedef GrammarResult(*GrammarFunction)(const GrammarCore<T>*, const T&, size_t);
+class GrammarCore : public MassDealocator
+{
+    public:
+        typedef AbstractTerm<ParsedNode<T>*> ParsedNodeTerm; 
+        typedef std::vector<ParsedNodeTerm*> GrammarResult;
+        typedef GrammarResult(*GrammarFunction)(const GrammarCore<T>*, const T&, size_t);
 
-public:
-    GrammarFunction func = nullptr;
-    
-    const GrammarCore<T> *left = nullptr;
-    const GrammarCore<T> *right = nullptr;
+    public:
+        GrammarFunction func = nullptr;
+        
+        const GrammarCore<T> *left = nullptr;
+        const GrammarCore<T> *right = nullptr;
 
-    std::string root_string;
+        std::string root_string;
 
-public:
-    GrammarCore();
-    GrammarCore(const GrammarFunction&);
-    GrammarCore(const GrammarFunction&, const std::string& root_string);
+    public:
+        GrammarCore();
+        GrammarCore(const GrammarFunction&);
+        GrammarCore(const GrammarFunction&, const std::string& root_string);
 
-    GrammarResult call(const T&, size_t) const;
+        GrammarResult call(const T&, size_t) const;
 
-    void create_assignment(const GrammarCore<T>* other);
-    GrammarCore<T>* create_plus(const GrammarCore<T>* other) const;
-    GrammarCore<T>* create_or(const GrammarCore<T>* other) const;
+        void create_assignment(const GrammarCore<T>* other);
+        GrammarCore<T>* create_plus(const GrammarCore<T>* other) const;
+        GrammarCore<T>* create_or(const GrammarCore<T>* other) const;
 
 };
 
@@ -51,7 +53,7 @@ template <typename T>
 typename GrammarCore<T>::GrammarResult alternative(const GrammarCore<T>*, const T&, size_t);
 
 template <typename T>
-class GrammarNode
+class GrammarNode : public MassDealocator
 {
     public:
         GrammarNode();
@@ -72,13 +74,8 @@ class GrammarNode
 };
 
 template <typename T>
-class ParsedNode
+class ParsedNode : public MassDealocator
 {
-    public:
-        static std::set<void*> allocated;
-
-        static void clear_allocated();
-
     public:
         ParsedNode(
             const GrammarCore<T>* node, 
@@ -95,10 +92,6 @@ class ParsedNode
         size_t start = 0;
         size_t end = 0;
         const T& data;
-
-    public:
-        static void* operator new(size_t size);
-        static void operator delete(void* ptr);
 };
 
 typedef GrammarNode<std::string> GrammarNodeStr;

@@ -2,17 +2,19 @@ cmake_minimum_required(VERSION 3.10)
 project(Opus)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
 
-include_directories(include include/grammar include/abstract_term)
+include_directories(include include/grammar include/abstract_term include/utils)
 
 # Automatically gather all .cpp files under src/
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS src/*.cpp)
 
 add_executable(main ${SRC_FILES})
 
-add_library(opus_lib STATIC src/grammar/grammar.cpp)
+add_library(opus_lib STATIC src/grammar/grammar.cpp src/utils/memory.cpp)
 target_include_directories(opus_lib PUBLIC include)
 
 # Enable testing for CTest
