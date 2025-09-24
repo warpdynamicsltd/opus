@@ -4,7 +4,7 @@
 #include "memory.h"
 
 template <typename T>
-struct AbstractTerm : public MassDealocator
+struct AbstractTerm : public MassDealocator<AbstractTerm<T>>
 {
     AbstractTerm(T value) : value(value) {};
     AbstractTerm(T value, std::vector<AbstractTerm<T>*> args) : value(value), args(args) {};
