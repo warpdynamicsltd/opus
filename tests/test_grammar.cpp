@@ -160,7 +160,7 @@ TEST(GrammarAddTest, SimpleTestCase) {
     TEST_NODE_FAILURE(start, "(1+2)$");
 
     ParsedNode<std::string>::clear_allocated();
-    GrammarCoreStr::ParsedNodeTerm::clear_allocated();
+    GrammarCoreStr::ParsedTree::clear_allocated();
     GrammarNodeStr::clear_allocated();
     GrammarCoreStr::clear_allocated();
 
@@ -321,7 +321,7 @@ TEST(GrammarMulTest, MultiplicationTestCase) {
     TEST_NODE_FAILURE(start, "(1*2)$");
 
     ParsedNode<std::string>::clear_allocated();
-    GrammarCoreStr::ParsedNodeTerm::clear_allocated();
+    GrammarCoreStr::ParsedTree::clear_allocated();
     GrammarNodeStr::clear_allocated();
     GrammarCoreStr::clear_allocated();
 }

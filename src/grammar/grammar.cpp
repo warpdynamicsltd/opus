@@ -4,7 +4,7 @@ GrammarCoreStr::GrammarResult st(const GrammarCoreStr* node, const std::string& 
 {
     if (index < input.size() && input.substr(index, node->root_string.size()) == node->root_string) {
         return {
-            new GrammarCoreStr::ParsedNodeTerm(
+            new GrammarCoreStr::ParsedTree(
                 new ParsedNodeStr(node, index, index + node->root_string.size(), input) 
             )
         };
@@ -16,7 +16,7 @@ GrammarCoreStr::GrammarResult digit(const GrammarCoreStr* node, const std::strin
 {
     if (index < input.size() && std::isdigit(input[index])){
         return {
-            new  GrammarCoreStr::ParsedNodeTerm(
+            new  GrammarCoreStr::ParsedTree(
                 new ParsedNodeStr(node, index, index + 1, input)
             ) 
         };
@@ -28,7 +28,7 @@ GrammarCoreStr::GrammarResult end(const GrammarCoreStr* node, const std::string&
 {
     if (index >= input.size()){
         return {
-            new GrammarCoreStr::ParsedNodeTerm( 
+            new GrammarCoreStr::ParsedTree( 
                 new ParsedNodeStr(node, index, index, input)
             ) 
         };
