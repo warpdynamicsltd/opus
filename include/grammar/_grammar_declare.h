@@ -32,6 +32,7 @@ class GrammarCore : public MassDealocator<GrammarCore<T>>
         const GrammarCore<T> *right = nullptr;
 
         std::string root_string;
+        std::string name;
 
     public:
         Transformation transform = nullptr;
@@ -92,6 +93,7 @@ class GrammarNode : public MassDealocator<GrammarNode<T>>
         GrammarCore<T>::GrammarResult operator()(const T& input, size_t index) const;
 
         GrammarNode<T>& operator=(const GrammarNode<T>& other);
+        GrammarNode<T>& set_name(const std::string& name);
 };
 
 template <typename T>
@@ -115,7 +117,7 @@ class ParsedNode : public MassDealocator<ParsedNode<T>>
         const T& data;
 
     public:
-        std::string to_string() const;
+        std::string to_string(int=0) const;
 };
 
 template<typename T>

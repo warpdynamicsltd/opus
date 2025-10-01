@@ -1,6 +1,7 @@
 #include "grammar.h"
 #include <map>
 #include <format>
+#include <iomanip>
 
 GrammarCoreStr::GrammarResult st(const GrammarCoreStr* node, const std::string& input, size_t index)
 {
@@ -50,7 +51,7 @@ std::map <GrammarCoreStr::GrammarFunction, std::string> func_name_map = {
 
 
 template<>
-std::string ParsedNode<std::string>::to_string() const {
+std::string ParsedNode<std::string>::to_string(int indent) const {
     std::string func_name;
     if (func_name_map.contains(this->node->func)) {
         func_name = func_name_map[this->node->func];
@@ -60,8 +61,9 @@ std::string ParsedNode<std::string>::to_string() const {
 
     //return this->data;
     return std::format(
-        "{0:x}:{1} ({2})",
-        reinterpret_cast<uintptr_t>(node),
+        "\n{0}{1}:{2} ({3})",
+        std::string(indent, ' '),
+        node->name,
         func_name,
         this->data.substr(this->start, this->end - this->start));
 }

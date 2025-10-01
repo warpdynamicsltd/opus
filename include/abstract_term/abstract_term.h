@@ -10,22 +10,31 @@ struct AbstractTerm : public MassDealocator<AbstractTerm<T>> {
     const T value;
     std::vector<const AbstractTerm<T>*> args;
 
-    std::string to_string() const;
+    std::string to_string(int=0) const;
 };
 
 template<typename T>
-std::string AbstractTerm<T>::to_string() const {
+std::string AbstractTerm<T>::to_string(int indent) const {
     std::string result;
 
     if (this == nullptr) {
         return "nullptr";
     }
 
-    result += value->to_string() + "(";
-    for (auto &arg : args) {
-        result += arg->to_string() + ",";
+    result += value->to_string(indent);
+    if (args.size() > 0) {
+        result += "\n" + std::string(indent, ' ') + "{";
+        int c = 0;
+        for (auto &arg : args) {
+            if (c++ < args.size() - 1) {
+                result += arg->to_string(indent + 2) + ",";
+            }
+            else {
+                result += arg->to_string(indent + 2);
+            }
+        }
+        result += "\n" + std::string(indent, ' ') + "}";
     }
-    result += ")";
 
     return result;
 }

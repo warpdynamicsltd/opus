@@ -39,18 +39,18 @@ GrammarCore<T>::GrammarCore(const GrammarFunction& customFunc, const std::string
 template <typename T>
 typename GrammarCore<T>::GrammarResult assign(const GrammarCore<T>* that, const T& input, size_t index)
 {
-    return that->left->call(input, index);
-    // typename GrammarCore<T>::GrammarResult result;
-    // for (auto n : that->left->call(input, index)) {
-    //     result.push_back(
-    //         new GrammarCore<T>::ParsedTree(
-    //             new ParsedNode<T>(
-    //                         that,
-    //                         index,
-    //                         n->value->end,
-    //                         input), {n}));
-    // }
-    // return result;
+    //return that->left->call(input, index);
+    typename GrammarCore<T>::GrammarResult result;
+    for (auto n : that->left->call(input, index)) {
+        result.push_back(
+            new GrammarCore<T>::ParsedTree(
+                new ParsedNode<T>(
+                            that,
+                            index,
+                            n->value->end,
+                            input), {n}));
+    }
+    return result;
 }
 
 template <typename T>
@@ -192,6 +192,13 @@ GrammarNode<T> GrammarNode<T>::operator<<(const typename GrammarCore<T>::Transfo
 }
 
 template<typename T>
+GrammarNode<T>& GrammarNode<T>::set_name(const std::string &name) {
+    this->node->name = name;
+    return *this;
+}
+
+
+template<typename T>
 GrammarCore<T>::GrammarResult GrammarNode<T>::operator()(const T& input, size_t index) const
 {
     return this->node->call(input, index);
@@ -215,9 +222,17 @@ GrammarCore<T>::ParsedTree* transform(const typename GrammarCore<T>::ParsedTree*
     // }
     //
     // return new GrammarCore<T>::ParsedTree(a->value, targs);
-    if (a->value->node->func == attach<T>) {
-        return a->value->node->transform(transform<T>(a->args[0]));
-    }
+    // if (a->args.size() == 1) {
+    //     return a->value->node->transform(transform<T>(a->args[0]));
+    // }
+
+    // if (a->value->node->func == attach<T>) {
+    //     return a->value->node->transform(transform<T>(a->args[0]));
+    // }
+
+    // if (a->value->node->func == alternative<T>) {
+    //     return a->value->node->transform(transform<T>(a->args[0]));
+    // }
 
     std::vector<const typename GrammarCore<T>::ParsedTree*> targs;
     for (auto arg : a->args) {
@@ -251,18 +266,22 @@ GrammarCore<T>::ParsedTree* transform_add(const typename GrammarCore<T>::ParsedT
 template <typename T>
 GrammarCore<T>::ParsedTree* transform_assign(const typename GrammarCore<T>::ParsedTree* a)
 {
-    return new GrammarCore<T>::ParsedTree(a->value, a->args);
+    // return new GrammarCore<T>::ParsedTree(a->value, a->args);
+    return new GrammarCore<T>::ParsedTree(a->args[0]->value, a->args[0]->args);
 }
 
 template <typename T>
 GrammarCore<T>::ParsedTree* transform_contract(const typename GrammarCore<T>::ParsedTree* a)
-{
-    return new GrammarCore<T>::ParsedTree(a->args[0]->value, a->args[0]->args);
+{   if (a->args.size() == 1) {
+        return new GrammarCore<T>::ParsedTree(a->args[0]->value, a->args[0]->args);
+    }
+    return new GrammarCore<T>::ParsedTree(a->value, a->args);
 }
 
 template <typename T>
 GrammarCore<T>::ParsedTree* transform_blank(const typename GrammarCore<T>::ParsedTree* a)
 {
+    //a->value->node->set_name(a->value->node->name + "_blank");
     return new GrammarCore<T>::ParsedTree(a->value);
 }
 
