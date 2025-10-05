@@ -227,7 +227,7 @@ GrammarCore<T>::ParsedTree* transform(const typename GrammarCore<T>::ParsedTree*
     // }
 
     // if (a->value->node->func == attach<T>) {
-    //     return a->value->node->transform(transform<T>(a->args[0]));
+    //     return a->value->node->transform(transform<T>(new GrammarCore<T>::ParsedTree(a->args[0]->value)));
     // }
 
     // if (a->value->node->func == alternative<T>) {
@@ -266,7 +266,7 @@ GrammarCore<T>::ParsedTree* transform_add(const typename GrammarCore<T>::ParsedT
 template <typename T>
 GrammarCore<T>::ParsedTree* transform_assign(const typename GrammarCore<T>::ParsedTree* a)
 {
-    // return new GrammarCore<T>::ParsedTree(a->value, a->args);
+    //return new GrammarCore<T>::ParsedTree(a->value, a->args);
     return new GrammarCore<T>::ParsedTree(a->args[0]->value, a->args[0]->args);
 }
 

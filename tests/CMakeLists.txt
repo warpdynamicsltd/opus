@@ -5,7 +5,7 @@ find_package(GTest REQUIRED)
 
 # Create executable for tests
 add_executable(tests
-    test_grammar.cpp
+    test_grammar.cpp test_transform.cpp
 )
 
 # Link the test executable against Google Test and your project library
